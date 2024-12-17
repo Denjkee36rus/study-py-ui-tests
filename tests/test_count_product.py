@@ -1,32 +1,38 @@
 import time
+
+import allure
 import pytest
 from pages.main_page import MainPage
 from pages.search_results_page import SearchResultsPage
 from pages.product_page import ProductPage
 from pages.cart_page import CartPage
-import allure
-
 
 
 @pytest.mark.usefixtures("browser")
-class TestFT:
-    @allure.feature('add_one_product')
+class TestCheckSumProduct:
+    @allure.feature('Добавление товаров в корзину')
+    @allure.story('Добавление двух разных товаров в корзину')
     def test_add_product_to_cart(self, browser):
-        # Вбиваем в строку поиска, на главной страницы, искомый товар
         main_page = MainPage(browser)
-        main_page.search_for_product('Гарри Поттер и философский камень')
+        main_page.search_for_product('Колобок')
 
-        # Закрываем попап скидок и выбираем искомый продукт
         search_results_page = SearchResultsPage(browser)
         search_results_page.close_discount_popup()
         search_results_page.click_on_first_product()
 
-        # Добавляем товар в карзину
         product_page = ProductPage(browser)
         product_page.add_to_cart()
 
-        # Проверяем наличие товара в карзине
+        main_page.return_main_page()
+
+        main_page.search_for_product('Гарри Поттер и Тайная комната')
+
+        search_results_page.close_discount_popup()
+        search_results_page.click_on_second_product()
+
+        product_page.add_to_cart()
+
         cart_page = CartPage(browser)
         cart_page.go_to_cart()
-        cart_page.check_product_in_cart('Гарри Поттер и философский камень')
 
+        cart_page.check_count_product_in_cart('2 товара')
